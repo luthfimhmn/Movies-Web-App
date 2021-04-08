@@ -1,4 +1,5 @@
 const { getDatabase } = require('../config/mongodb');
+// const MovieTable = getDatabase().collection('movies');
 
 class Movie {
   constructor (id, title, overview, poster_path, popularity, tags){
@@ -10,27 +11,20 @@ class Movie {
     this.tags = tags
   }
 
-  static readAll (cb) {
-    getDatabase().collection('movies').find().toArray()
-      .then(movies => {
-        let instances = movies.map(movie => new Movie(movie.id, movie.title, movie.overview, movie.poster_path, movie.popularity, movie.tags))
-        cb(null, instances)
-      })
-      .catch(err => {
-        cb(err, null)
-      })
+  static readAll () {
+     return getDatabase().collection('movies').find().toArray()
   }
 
-  static create () {
-
+  static create (newMovie) {
+    return getDatabase().collection('movies').insertOne(newMovie)
   }
 
   static update () {
 
   }
 
-  static delete () {
-
+  static delete (id) {
+    return getDatabase().collection('movies').remove({id})
   }
 }
 
