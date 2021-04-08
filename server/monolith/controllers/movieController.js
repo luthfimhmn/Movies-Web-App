@@ -21,32 +21,31 @@ class MovieController {
       popularity,
       tags
     }
-    Movie.create(newMovie, (err, data) => {
-      if(err) {
-        next(err)
-      } else {
-        res.status(201).json(data)
-      }
-    })
+    Movie.create(newMovie)
+      .then(data => res.status(201).json(data))
+      .catch(err => next(err))
   }
 
-  static getEdit () {
-
+  static getById (req, res, next) {
+    Movie.getById(req.params.id)
+      .then(movie => res.status(200).json(movie))
+      .catch(err => next(err))
   }
 
-  static postEdit () {
-
+  static update (req, res, next) {
+    const id = req.params.id
+    const updatedData = req.body
+    Movie.update(id, updatedData)
+      .then(result => res.status(200).json(result))
+      .catch(err => next(err))
   }
 
   static getDelete (req, res, next) {
     const id = req.params.id
-    Movie.delete(id, (err,data) => {
-      if(err){
-        next(err)
-      } else {
-        res.status(200).json(data)
-      }
-    })
+    Movie.delete(id)
+      .then(data => {
+        res.status(200).json({message: 'success delete data' , data})})
+      .catch(err => next(err))
   }
 }
 

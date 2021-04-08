@@ -1,3 +1,6 @@
+const { ObjectId } = require('mongodb');
+const { getDatabase } = require('../config/mongodb');
+
 class Tvseries {
   constructor (title, overview, poster_path, popularity, tags) {
     this.title = title
@@ -7,20 +10,26 @@ class Tvseries {
     this.tags = tags
   }
 
-  static readAllTvSeries () {
-
+  static readAll () {
+    return getDatabase().collection('tv_series').find().toArray()
   }
 
-  static createTvSeries () {
-
+  static create (newTvSeries) {
+    return getDatabase().collection('tv_series').insertOne(newTvSeries)
   }
 
-  static updateTvSeries () {
-
+  static getById (id) {
+    return getDatabase().collection('tv_series').findOne({ _id: ObjectId(id) })
   }
 
-  static deleteTvSeries () {
+  static update (id, updatedData) {
+    return getDatabase().collection('tv_series').updateOne({ _id: ObjectId(id) }, {
+      $set: updatedData
+    })
+  }
 
+  static delete (id) {
+    return getDatabase().collection('tv_series').deleteOne({ _id: ObjectId(id) })
   }
 }
 

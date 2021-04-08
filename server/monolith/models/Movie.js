@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb');
 const { getDatabase } = require('../config/mongodb');
 // const MovieTable = getDatabase().collection('movies');
 
@@ -19,12 +20,18 @@ class Movie {
     return getDatabase().collection('movies').insertOne(newMovie)
   }
 
-  static update () {
+  static getById (id) {
+    return getDatabase().collection('movies').findOne({ _id: ObjectId(id) })
+  }
 
+  static update (id, updatedData) {
+    return getDatabase().collection('movies').updateOne({ _id: ObjectId(id) }, {
+      $set : updatedData
+    })
   }
 
   static delete (id) {
-    return getDatabase().collection('movies').remove({id})
+    return getDatabase().collection('movies').deleteOne({ _id: ObjectId(id) })
   }
 }
 
