@@ -17,7 +17,7 @@ class SeriesController {
       tags
     }
     Series.create(newSeries)
-      .then(data => res.status(201).json(data))
+      .then(data => res.status(201).json(data.ops[0]))
       .catch(err => next(err))
   }
 
