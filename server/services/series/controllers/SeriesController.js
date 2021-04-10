@@ -32,7 +32,7 @@ class SeriesController {
     const id = req.params.id
     const updatedData = req.body
     Series.update(id, updatedData)
-      .then(result => res.status(200).json(result))
+      .then(result => res.status(200).json(result.value))
       .catch(err => next(err))
   }
 

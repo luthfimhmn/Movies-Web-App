@@ -15,9 +15,8 @@ class Movie {
   }
 
   static update (id, updatedData) {
-    return getDatabase().collection('movies').updateOne({ _id: ObjectId(id) }, {
-      $set: updatedData
-    })
+    return getDatabase().collection('movies').findOneAndUpdate({ _id: ObjectId(id) }, {
+      $set: updatedData}, { returnOriginal: false })
   }
 
   static delete (id) {

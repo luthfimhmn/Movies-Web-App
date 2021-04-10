@@ -15,9 +15,8 @@ class Series {
   }
 
   static update (id, updatedData) {
-    return getDatabase().collection('tv_series').updateOne({ _id: ObjectId(id) }, {
-      $set: updatedData
-    })
+    return getDatabase().collection('tv_series').findOneAndUpdate({ _id: ObjectId(id) }, {
+      $set: updatedData}, { returnOriginal: false })
   }
 
   static delete (id) {

@@ -38,7 +38,7 @@ class MovieController {
     const id = req.params.id
     const updatedData = req.body
     Movie.update(id, updatedData)
-      .then(result => res.status(200).json(result))
+      .then(result => res.status(200).json(result.value))
       .catch(err => next(err))
   }
 

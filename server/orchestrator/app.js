@@ -1,15 +1,15 @@
-const { ApolloServer, gql } = require('apollo-server');
-const axios = require('axios');
+const { ApolloServer, gql } = require('apollo-server')
+const axios = require('axios')
 
 // A schema is a collection of type definitions (hence "typeDefs")
 // that together define the "shape" of queries that are executed against
 // your data.
 const typeDefs = gql`
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
-
   # This "Book" type defines the queryable fields for every book in our data source.
 
   type Movie {
+    _id: ID
     title: String
     overview: String
     poster_path: String
@@ -18,6 +18,7 @@ const typeDefs = gql`
   }
 
   type Series {
+    _id: ID
     title: String
     overview: String
     poster_path: String
@@ -26,6 +27,14 @@ const typeDefs = gql`
   }
 
   input MovieInput {
+    title: String
+    overview: String
+    poster_path: String
+    popularity: Float
+    tags: [String]
+  }
+
+  input SeriesInput {
     title: String
     overview: String
     poster_path: String
@@ -43,21 +52,13 @@ const typeDefs = gql`
 
   type Mutation {
     addMovie(newMovie: MovieInput): Movie,
-    addSeries(title: String, overview: String, poster_path: String, popularity: Float, tags: [String]): Series
+    addSeries(title: String, overview: String, poster_path: String, popularity: Float, tags: [String]): Series,
+    updateMovie(id: ID!, updatedMovie: MovieInput): Movie,
+    updateSeries(id: ID!, updatedSeries: SeriesInput): Series
+    deleteMovie(id: ID!): String
+    deleteSeries(id: ID!): String
   }
 `;
-
-// const books = [
-//   {
-//     title: 'The Awakening',
-//     author: 'Kate Chopin',
-//   },
-//   {
-//     title: 'City of Glass',
-//     author: 'Paul Auster',
-//   },
-// ];
-
 
 // Resolvers define the technique for fetching the types defined in the
 // schema. This resolver retrieves books from the "books" array above.
@@ -106,6 +107,56 @@ const resolvers = {
           tags: args.tags
         }
         const { data } = await axios.post('http://localhost:3002', newSeries)
+        return data
+      } catch (error) {
+        throw error
+      }
+    },
+    deleteMovie: async (_, args) => {
+      try {
+        const id = args.id
+        const { data } = await axios.delete(`http://localhost:3000/${id}`)
+        return data
+      } catch (error) {
+        throw error
+      }
+    },
+    deleteSeries: async (_, args) => {
+      try {
+        const id = args.id
+        const { data } = await axios.delete(`http:localhost:3002/${id}`)
+        return data
+      } catch (error) {
+        throw error
+      }
+    },
+    updateMovie: async (_, args) => {
+      try {
+        const updatedMovie = {
+          title: args.updatedMovie.title,
+          overview: args.updatedMovie.overview,
+          poster_path: args.updatedMovie.poster_path,
+          popularity: args.updatedMovie.popularity,
+          tags: args.updatedMovie.tags
+        }
+        const id = args.id
+        const { data } = await axios.put(`http://localhost:3000/${id}`, updatedMovie)
+        return data
+      } catch (err) {
+        throw error
+      }
+    },
+    updateSeries: async (_, args) => {
+      try {
+        const updatedSeries = {
+          title: args.updatedSeries.title,
+          overview: args.updatedSeries.overview,
+          poster_path: args.updatedSeries.poster_path,
+          popularity: args.updatedSeries.popularity,
+          tags: args.updatedSeries.tags
+        }
+        const id = args.id
+        const { data } = await axios.put(`http://localhost:3002/${id}`, updatedSeries)
         return data
       } catch (error) {
         throw error
