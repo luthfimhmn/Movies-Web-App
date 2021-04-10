@@ -1,5 +1,8 @@
 const { gql } = require('apollo-server');
 const axios = require('axios');
+const Redis = require('ioredis');
+const redis = new Redis();
+const baseUrl = 'http://localhost:4002/'
 
 const typeDefs = gql`
  type Series {
@@ -9,6 +12,10 @@ const typeDefs = gql`
     poster_path: String
     popularity: Float
     tags: [String]
+  }
+
+  type ResponseSeriesDelete {
+    message: String
   }
 
   input SeriesInput {
@@ -26,7 +33,7 @@ const typeDefs = gql`
   extend type Mutation {
     addSeries(title: String, overview: String, poster_path: String, popularity: Float, tags: [String]): Series,
     updateSeries(id: ID!, updatedSeries: SeriesInput): Series
-    deleteSeries(id: ID!): String
+    deleteSeries(id: ID!): ResponseSeriesDelete
   }
 `
 
@@ -34,8 +41,16 @@ const resolvers = {
   Query: {
     series: async () => {
       try {
-        const { data } = await axios.get('http://localhost:3002')
-        return data
+        const seriesData = await redis.get('series:data')
+        if (!seriesData) {
+          console.log('Not cached yet')
+          const { data } = await axios.get(baseUrl)
+          await redis.set('series:data', JSON.stringify(data))
+          return data
+        } else {
+          console.log('Cached!')
+          return (JSON.parse(seriesData))
+        }
       } catch (error) {
         throw error
       }
@@ -44,6 +59,7 @@ const resolvers = {
   Mutation: {
     addSeries: async (_, args) => {
       try {
+        await redis.del('series:data')
         const newSeries = {
           title: args.title,
           overview: args.overview,
@@ -51,7 +67,7 @@ const resolvers = {
           popularity: args.popularity,
           tags: args.tags
         }
-        const { data } = await axios.post('http://localhost:3002', newSeries)
+        const { data } = await axios.post(baseUrl, newSeries)
         return data
       } catch (error) {
         throw error
@@ -59,8 +75,9 @@ const resolvers = {
     },
     deleteSeries: async (_, args) => {
       try {
+        await redis.del('series:data')
         const id = args.id
-        const { data } = await axios.delete(`http:localhost:3002/${id}`)
+        const { data } = await axios.delete(baseUrl + id)
         return data
       } catch (error) {
         throw error
@@ -68,6 +85,7 @@ const resolvers = {
     },
     updateSeries: async (_, args) => {
       try {
+        await redis.del('series:data')
         const updatedSeries = {
           title: args.updatedSeries.title,
           overview: args.updatedSeries.overview,
@@ -76,7 +94,7 @@ const resolvers = {
           tags: args.updatedSeries.tags
         }
         const id = args.id
-        const { data } = await axios.put(`http://localhost:3002/${id}`, updatedSeries)
+        const { data } = await axios.put(baseUrl + id, updatedSeries)
         return data
       } catch (error) {
         throw error

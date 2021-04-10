@@ -1,5 +1,8 @@
 const { gql } = require('apollo-server');
 const axios = require('axios');
+const Redis = require('ioredis');
+const redis = new Redis();
+const baseUrl = 'http://localhost:4001/'
 
 const typeDefs = gql`
   type Movie {
@@ -9,6 +12,10 @@ const typeDefs = gql`
     poster_path: String
     popularity: Float
     tags: [String]
+  }
+
+  type ResponseMovieDelete {
+    message: String
   }
 
   input MovieInput {
@@ -26,7 +33,7 @@ const typeDefs = gql`
   extend type Mutation {
     addMovie(newMovie: MovieInput): Movie
     updateMovie(id: ID!, updatedMovie: MovieInput): Movie
-    deleteMovie(id: ID!): String
+    deleteMovie(id: ID!): ResponseMovieDelete
   }
 `
 
@@ -34,8 +41,16 @@ const resolvers = {
   Query: {
     movies: async () => {
       try {
-        const { data } = await axios.get('http://localhost:3000')
-        return data
+        const moviesData = await redis.get('movies:data')
+        if (!moviesData) {
+          console.log('Not cached yet')
+          const { data } = await axios.get(baseUrl)
+          await redis.set('movies:data', JSON.stringify(data))
+          return data
+        } else {
+          console.log('Cached!');
+          return (JSON.parse(moviesData))
+        }
       } catch (error) {
         throw error
       }
@@ -44,6 +59,7 @@ const resolvers = {
   Mutation: {
     addMovie: async (_, args) => {
       try {
+        await redis.del('movies:data')
         const newMovie = {
           title: args.newMovie.title,
           overview: args.newMovie.overview,
@@ -51,7 +67,7 @@ const resolvers = {
           popularity: args.newMovie.popularity,
           tags: args.newMovie.tags
         }
-        const { data } = await axios.post('http://localhost:3000', newMovie)
+        const { data } = await axios.post(baseUrl, newMovie)
         return data
       } catch (error) {
         throw error
@@ -59,6 +75,7 @@ const resolvers = {
     },
     updateMovie: async (_, args) => {
       try {
+        await redis.del('movies:data')
         const updatedMovie = {
           title: args.updatedMovie.title,
           overview: args.updatedMovie.overview,
@@ -67,7 +84,7 @@ const resolvers = {
           tags: args.updatedMovie.tags
         }
         const id = args.id
-        const { data } = await axios.put(`http://localhost:3000/${id}`, updatedMovie)
+        const { data } = await axios.put(baseUrl + id, updatedMovie)
         return data
       } catch (err) {
         throw error
@@ -75,8 +92,9 @@ const resolvers = {
     },
     deleteMovie: async (_, args) => {
       try {
+        await redis.del('movies:data')
         const id = args.id
-        const { data } = await axios.delete(`http://localhost:3000/${id}`)
+        const { data } = await axios.delete(baseUrl + id)
         return data
       } catch (error) {
         throw error

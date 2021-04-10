@@ -45,7 +45,12 @@ class MovieController {
   static delete (req, res, next) {
     const id = req.params.id
     Movie.delete(id)
-      .then(data => res.status(200).json({ message: 'Success delete movie'}))
+      .then(data => {
+        if(data.deletedCount === 0) {
+          return res.status(500).json({ message: 'Fail to delete data, ID not found'})
+        }
+        res.status(200).json({ message: 'Success delete movie'})
+      })
       .catch(err => next(err))
   }
 

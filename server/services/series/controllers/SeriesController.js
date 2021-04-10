@@ -39,7 +39,12 @@ class SeriesController {
   static delete (req, res, next) {
     const id = req.params.id
     Series.delete(id)
-      .then(data => res.status(200).json({ message: 'success delete tv series'}))
+      .then(data => {
+        if(data.deletedCount === 0) {
+          return res.status(500).json({ message: 'Fail to delete data, ID not found'})
+        }
+        res.status(200).json({ message: 'success delete tv series'})
+      })
       .catch(err => next(err))
   }
 }

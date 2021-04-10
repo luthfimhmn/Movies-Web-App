@@ -1,7 +1,7 @@
 const express = require('express');
 const { connectMongodb } = require('./config/mongodb');
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4001; // 3000 before
 const errorHandler = require('./middlewares/errorHandler');
 const router = require('./routes');
 
