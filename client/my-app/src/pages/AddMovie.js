@@ -21,6 +21,13 @@ function AddMovie () {
         newMovie: inputForm
       }
     })
+    setInputForm({
+      title: "",
+      popularity: 0,
+      overview: "",
+      poster_path: "",
+      tags: []
+    })
   }
 
 

@@ -1,17 +1,21 @@
 import { useMutation, useQuery } from "@apollo/client"
 import { useState } from "react"
 import { useParams } from "react-router"
-import { UPDATE_MOVIE } from "../queries"
+import { GET_ALL, UPDATE_MOVIE } from "../queries"
+import { useHistory } from 'react-router-dom'
 
 function EditMovie () {
-  let { id } = useParams();
+  let { id } = useParams()
+  const history = useHistory()
+  const { data } = useQuery(GET_ALL)
+  const dataMovie = data.movies.find(movie => movie._id === id)
 
   const [inputForm, setInputForm] = useState({
-    title: "",
-    popularity: 0,
-    overview: "",
-    poster_path: "",
-    tags: []
+    title: dataMovie.title,
+    popularity: dataMovie.popularity,
+    overview: dataMovie.overview,
+    poster_path: dataMovie.poster_path,
+    tags: dataMovie.tags
   })
 
   const [editMovie] = useMutation(UPDATE_MOVIE)
@@ -24,6 +28,7 @@ function EditMovie () {
         updatedMovie: inputForm
       }
     })
+    history.push('/')
   }
 
   return (

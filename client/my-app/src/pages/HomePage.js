@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useQuery } from '@apollo/client'
 import { GET_ALL } from '../queries'
 import Loading from '../components/Loading'
@@ -7,6 +7,10 @@ import MoviesPage from './MoviesPage'
 
 function Home () {
   const { loading, error, data, refetch } = useQuery(GET_ALL)
+
+  useEffect(() => {
+    refetch()
+  }, [refetch])
 
   if (loading) return (
     <Loading/>
