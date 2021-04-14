@@ -1,11 +1,12 @@
 import React from 'react'
 import { useQuery } from '@apollo/client'
-import { GET_MOVIES } from '../queries'
-import Movie from '../components/Movie'
+import { GET_ALL } from '../queries'
 import Loading from '../components/Loading'
+import SeriesPage from './SeriesPage'
+import MoviesPage from './MoviesPage'
 
 function Home () {
-  const { loading, error, data} = useQuery(GET_MOVIES)
+  const { loading, error, data, refetch } = useQuery(GET_ALL)
 
   if (loading) return (
     <Loading/>
@@ -14,32 +15,13 @@ function Home () {
 
   return (
     <>
-      <table className="table">
-          <thead>
-            <tr>
-              <th>No</th>
-              <th>Title</th>
-              <th>Popularity</th>
-              <th>Overview</th>
-              <th>Poster</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-      { data.movies.map((movie, index) => {
-        return (
-          <Movie
-            movie={movie}
-            index={index}
-            key={movie._id}
-            category='movies'
-          >
-          </Movie>
-        )
-      })
-      }
-      </tbody>
-        </table><br/><br/>
+      <MoviesPage
+        movies={data.movies}
+      />
+
+      <SeriesPage
+        series={data.series}
+      />
     </>
   )
 }

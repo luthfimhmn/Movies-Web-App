@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-export const GET_MOVIES = gql`
+export const GET_ALL = gql`
 {
   movies {
     _id
@@ -10,11 +10,20 @@ export const GET_MOVIES = gql`
     poster_path
     tags
   }
+  series {
+    _id
+    title
+    popularity
+    overview
+    poster_path
+  }
 }
 `
 
+
+
 export const ADD_MOVIE = gql`
-mutation AddMovie($newMovie: newMovie) {
+mutation AddMovie($newMovie: MovieInput) {
   addMovie(newMovie: $newMovie) {
     _id
     title
@@ -26,7 +35,7 @@ mutation AddMovie($newMovie: newMovie) {
 }`
 
 export const UPDATE_MOVIE = gql`
-mutation UpdateMovie($id: ID!, $updatedMovie: updatedMovie) {
+mutation UpdateMovie($id: ID!, $updatedMovie: MovieInput) {
   updateMovie(id: $id, updatedMovie: $updatedMovie) {
     title
     overview
@@ -38,6 +47,8 @@ mutation UpdateMovie($id: ID!, $updatedMovie: updatedMovie) {
 
 export const DELETE_MOVIE = gql`
 mutation DeleteMovie($id: ID!) {
-  deleteMovie(id: $id)
+  deleteMovie(id: $id) {
+    message
+  }
 }
 `

@@ -28,6 +28,7 @@ const typeDefs = gql`
 
   extend type Query {
     movies: [Movie]
+    movie(movieId: ID!): Movie
   }
 
   extend type Mutation {
@@ -51,6 +52,15 @@ const resolvers = {
           console.log('Cached!');
           return (JSON.parse(moviesData))
         }
+      } catch (error) {
+        throw error
+      }
+    },
+    movie: async (_, args) => {
+      try {
+        const id = args.movieId
+        const { data } = await axios.get(baseUrl + id)
+        return data
       } catch (error) {
         throw error
       }

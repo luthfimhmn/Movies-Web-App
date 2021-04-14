@@ -1,8 +1,11 @@
-import { useMutation } from "@apollo/client";
-import { useState } from "react";
-import { ADD_MOVIE } from "../queries";
+import { useMutation, useQuery } from "@apollo/client"
+import { useState } from "react"
+import { useParams } from "react-router"
+import { UPDATE_MOVIE } from "../queries"
 
-function AddMovie () {
+function EditMovie () {
+  let { id } = useParams();
+
   const [inputForm, setInputForm] = useState({
     title: "",
     popularity: 0,
@@ -11,24 +14,22 @@ function AddMovie () {
     tags: []
   })
 
-  const [addMovie] = useMutation(ADD_MOVIE)
-
+  const [editMovie] = useMutation(UPDATE_MOVIE)
 
   function formOnSubmit (e) {
     e.preventDefault()
-    addMovie({
+    editMovie({
       variables: {
-        newMovie: inputForm
+        id: id,
+        updatedMovie: inputForm
       }
     })
   }
 
-
-
   return (
     <>
       <div className="container center">
-        <h1>Add Movie Form</h1>
+        <h1>Edit Movie Form</h1>
         <form onSubmit={e => formOnSubmit(e)}>
         <label htmlFor="title">Title :</label><br/>
         <input
@@ -88,5 +89,4 @@ function AddMovie () {
   )
 }
 
-
-export default AddMovie
+export default EditMovie

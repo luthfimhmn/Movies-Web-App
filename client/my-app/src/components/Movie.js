@@ -1,8 +1,10 @@
 import { useMutation } from '@apollo/client'
 import { favoritesVar } from '../graphql/vars'
 import { DELETE_MOVIE } from '../queries'
+import { useHistory } from 'react-router-dom'
 
 function Movie (props) {
+  const history = useHistory()
   const [destroyMovie] = useMutation(DELETE_MOVIE)
 
   const addToFavorite = () => {
@@ -16,7 +18,7 @@ function Movie (props) {
     console.log('To detail');
   }
 
-  function deleteMovie (id) {
+  function deleteData (id) {
     console.log(id , 'ini idnya');
     console.log('masuk delete movie');
     destroyMovie({
@@ -26,14 +28,21 @@ function Movie (props) {
     })
   }
 
+  function editData (props) {
+    console.log(props);
+    history.push({
+      pathname: `/movies/${props._id}`,
+      state: props
+    })
+  }
+
   function removeFavorites (id) {
     const existingFavorites = favoritesVar()
     const temp = existingFavorites.filter(favorite => favorite._id !== id)
     favoritesVar(temp)
   }
 
-  if(props.category === 'movies') {
-    console.log(props.category);
+  if(props.category === 'movies' || props.category === 'series') {
     return (
       <>
          <tr>
@@ -47,7 +56,8 @@ function Movie (props) {
           <td>
             <button onClick={() => addToFavorite(props.movie)} className="btn btn-primary">Favorite</button>
             <button onClick={() => toDetail(props.movie._id)} className="btn btn-primary">Detail</button>
-            <button onClick={() => deleteMovie(props.movie._id)} className="btn btn-primary">Delete</button>
+            <button onClick={() => editData(props.movie)} className="btn btn-primary">Edit</button>
+            <button onClick={() => deleteData(props.movie._id)} className="btn btn-primary">Delete</button>
           </td>
         </tr>
       </>

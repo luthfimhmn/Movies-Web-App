@@ -10,6 +10,7 @@ import {
   Link
 } from "react-router-dom";
 import Favorite from './pages/FavoritePage';
+import EditMovie from './pages/EditMovie';
 
 function App() {
   return (
@@ -22,9 +23,6 @@ function App() {
           <ul>
             <li>
               <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/about">About</Link>
             </li>
             <li>
               <Link to="/addmovie">Add Movie</Link>
@@ -43,6 +41,9 @@ function App() {
           </Route>
           <Route path="/addmovie">
             <AddMovie />
+          </Route>
+          <Route path="/movies/:id">
+            <EditMovie />
           </Route>
           <Route path="/">
             <Home />
