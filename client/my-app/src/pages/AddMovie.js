@@ -1,12 +1,26 @@
 import { useMutation } from "@apollo/client";
+import { useState } from "react";
 import { ADD_MOVIE } from "../queries";
 
 function AddMovie () {
+  const [inputForm, setInputForm] = useState({
+    title: "",
+    popularity: 0,
+    overview: "",
+    poster_path: "",
+    tags: []
+  })
 
-  const [addMovie, { data }] = useMutation(ADD_MOVIE)
+  const [addMovie] = useMutation(ADD_MOVIE)
+
   const formOnSubmit = (e) => {
-    e.preventDefault();
-    console.log('test');
+    e.preventDefault()
+    console.log(inputForm);
+    addMovie({
+      variables: {
+        newMovie: inputForm
+      }
+    })
   }
 
   return (
@@ -14,47 +28,56 @@ function AddMovie () {
       <div className="container center">
         <h1>Add Movie Form</h1>
         <form onSubmit={e => formOnSubmit(e)}>
-        <label htmlFor="first_name">Title :</label><br/>
+        <label htmlFor="title">Title :</label><br/>
         <input
-          id="name"
-          name="first_name"
+          id="title"
+          name="title"
           placeholder="Title"
           type="text"
+          value={inputForm.title}
+          onChange={(e) => setInputForm({...inputForm, title: e.target.value})}
         />
         <br/>
 
-        <label htmlFor="last_name">Overview :</label><br/>
+        <label htmlFor="popularity">Popularity :</label><br/>
         <input
-          id="last_name"
+          id="popularity"
           type="text"
-          name="last_name"
+          name="popularity"
+          placeholder="popularity"
+          value={inputForm.popularity}
+          onChange={(e) => setInputForm({...inputForm, popularity: e.target.value})}
+        /><br/>
+
+        <label htmlFor="overview">Overview :</label><br/>
+        <input
+          id="overview"
+          type="text"
+          name="overview"
           placeholder="Overview"
+          value={inputForm.overview}
+          onChange={(e) => setInputForm({...inputForm, overview: e.target.value})}
         /><br/>
 
-        <label htmlFor="email">Poster Path :</label><br/>
+        <label htmlFor="poster_path">Poster path :</label><br/>
         <input
-          id="email"
+          id="poster_path"
           type="text"
-          name="email"
-          placeholder="Poster Path"
+          name="poster_path"
+          placeholder="poster_path"
+          value={inputForm.poster_path}
+          onChange={(e) => setInputForm({...inputForm, poster_path: e.target.value})}
         /><br/>
 
-        <label htmlFor="avatar">Popularity :</label><br/>
+        <label htmlFor="tags">Tags :</label><br/>
         <input
-          id="avatar"
+          id="tags"
           type="text"
-          name="avatar"
-          placeholder="Popularity"
-        /><br/>
-
-        <label htmlFor="avatar">Tags :</label><br/>
-        <input
-          id="avatar"
-          type="text"
-          name="avatar"
+          name="tags"
           placeholder="Tags"
+          value={inputForm.tags}
+          onChange={(e) => setInputForm({...inputForm, tags: [e.target.value]})}
         /><br/><br/>
-
 
         <button className="btn btn-primary">submit</button>
         </form>
